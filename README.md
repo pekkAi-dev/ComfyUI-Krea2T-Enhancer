@@ -4,7 +4,7 @@
 
 Prompt-adherence enhancement for Krea2 diffusion models in ComfyUI.
 
-The enhancer nodes patch Krea2's text-fusion path during sampling. The package also includes phrase weighting, a Turbo sigma scheduler, and an image-only character LoRA loader.
+The enhancer nodes patch Krea2's text-fusion path during sampling. The package also includes phrase weighting, a virtual-image phrase encoder, a Turbo sigma scheduler, and an image-only character LoRA loader.
 
 ## Installation
 
@@ -25,9 +25,31 @@ No extra Python packages are required beyond a working ComfyUI Krea2 setup.
 | **Krea2T Enhancer Advanced** | `MODEL` | Same enhancer path, plus a direct post-`txtmlp` `text_scale` control for fused text-token strength. |
 | **Krea2 Turbo Reference Sigmas (From Latent)** | `SIGMAS`, `LATENT` | Builds a Turbo sigma schedule based on the official Krea 2 Turbo scheduler settings and validates the connected latent dimensions. |
 | **Krea2 Text Encode — Attention-Weighted Phrases** | `MODEL`, `CONDITIONING`, `STRING` | Encodes weighted phrases and changes only the image-query-to-selected-text-key attention odds in Krea2's shared DiT blocks. |
+| **Krea2 — Virtual Image Conditioning** | `CONDITIONING`, `STRING` | Encodes a prompt-rendered virtual image through Qwen3-VL and supports inline phrase weights, without a MODEL socket. |
 | **Krea2T Character LoRA — Image Only** | `MODEL`, `STRING` | Applies a character LoRA directly to image tokens while skipping unsupported weights. |
 | **Krea2 Selective LoRA Loader Model Only (Projection Split)** | `MODEL`, `STRING` | Alternative model-only loader with switches for the Krea2 projector, remaining TextFusion path, and external text MLP. |
 | **Krea2 · Projector + External MLP · LoRA Isolation** | `MODEL`, `STRING` | Applies only selected saved LoRA updates for the projector and the two external text-MLP linear layers. |
+
+## Krea2 — Virtual Image Conditioning
+
+This text-to-image encoder sends the prompt through two native Qwen3-VL paths: ordinary text encoding and a generated image containing the clean prompt text. It does **not** create an imagined scene or require external reference images. Its 12 Krea2 output taps remain intact.
+
+**Location:** `krea2_conditioning/` inside the Enhancer package.
+
+**Connect:** `Krea2 CLIP → Krea2 — Virtual Image Conditioning → CONDITIONING` to your normal guider/sampler. Keep the diffusion MODEL and LoRA connections unchanged. Unlike the separate Attention-Weighted Phrases node above, **this node has no MODEL input or output**. Install only one copy of this virtual-image node to avoid duplicate `Krea2EditConditioning` registrations.
+
+Type phrase weights in the same prompt, for example `a (red bicycle:1.5) beside a (blue wall:0.7)`. The encoder removes the weight annotations before rendering/encoding and applies phrase-specific attention bias to text keys through conditioning-scoped hooks. This remains separate from the virtual-image controls. A plain prompt needs no special syntax.
+
+| Control | Default | Effect |
+|---|---:|---|
+| `virtual_image_influence` | `1.0` | Master influence for internal-image visual tokens; `0` removes those visual rows (vanilla-like), `1` keeps the native ghost path. |
+| `virtual_context_influence` | `1.0` | Relative influence for gray canvas pixels versus printed-text pixels; `1` keeps the original ghost weighting. |
+| `virtual_vision_resolution` | `0` | Longest pixel side before Qwen vision preprocessing. `0` preserves the original ghost dimensions; nonzero values resize the virtual image. |
+| `attention_layer_start` / `attention_layer_end` | `1` / `35` | Qwen **language** layers that receive nonneutral image-token priority. They do not select vision-tower layers. |
+| `diffusion_priority_blocks` | `8` | First N Krea2 diffusion blocks with the optional visual attention bias; `0` disables it. Eight is experimental, not an optimized range. |
+| `diffusion_priority_strength` | `1.0` | Visual-key attention multiplier in the selected diffusion blocks. It does not alter sampling steps. |
+
+The node also outputs a text report of encoded rows and active settings. Inline phrase emphasis applies across shared Krea2 diffusion blocks independently of the virtual-image diffusion-block limit. Full image-quality changes depend on your model and workflow; these controls are not guarantees of improved results.
 
 ## Character LoRA — Image Only
 
