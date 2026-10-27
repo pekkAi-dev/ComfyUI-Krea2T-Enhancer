@@ -22,10 +22,10 @@ license = {file = "LICENSE"}
 
 
 [project.urls]
-Repository = "https://github.com/capitan01R/ComfyUI-Krea2T-Enhancer"
+Repository = "https://github.com/pekkAi-dev/ComfyUI-Krea2T-Enhancer"
 #  Used by Comfy Registry https://registry.comfy.org
-Documentation = "https://github.com/capitan01R/ComfyUI-Krea2T-Enhancer/wiki"
-"Bug Tracker" = "https://github.com/capitan01R/ComfyUI-Krea2T-Enhancer/issues"
+Documentation = "https://github.com/pekkAi-dev/ComfyUI-Krea2T-Enhancer/wiki"
+"Bug Tracker" = "https://github.com/pekkAi-dev/ComfyUI-Krea2T-Enhancer/issues"
 
 [tool.comfy]
 PublisherId = "capitan01r"

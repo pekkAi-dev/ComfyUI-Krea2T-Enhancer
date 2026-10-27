@@ -1,5 +1,10 @@
 # ComfyUI-Krea2T-Enhancer
 
+> [!NOTE]
+> **Community mirror.** The original repository, [capitan01R/ComfyUI-Krea2T-Enhancer](https://github.com/capitan01R/ComfyUI-Krea2T-Enhancer), was deleted around 2026-10-17. This is an unmodified copy of the latest known state (`830b76f`, 2026-10-16) with full commit history, including the **Krea2 Virtual Image Conditioning** node. All code is by capitan01R under the MIT license. The only changes here are this note and the URLs in `pyproject.toml`.
+>
+> To switch an existing install: `git remote set-url origin https://github.com/pekkAi-dev/ComfyUI-Krea2T-Enhancer && git pull`
+
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Support-yellow.svg)](https://buymeacoffee.com/capitan01r)
 
 Prompt-adherence enhancement for Krea2 diffusion models in ComfyUI.
